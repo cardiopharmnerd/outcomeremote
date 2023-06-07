@@ -1,6 +1,6 @@
 # outcomeremote
 
-The PDF outcomeremote.pdf file contains the full protocol with stata code for the manuscript for "Use of secondary prevention medications in metropolitan and non-metropolitan areas: an analysis of 43,927 myocardial infarctions in Australia "
+The PDF outcomeremote.pdf file contains the full protocol with stata code for the manuscript for "No effect of remoteness on clinical outcomes following myocardial infarction: an analysis of 43,927 myocardial infarctions in Victoria, Australia"
 
 The .do file "outcomeremote.do" contains the original stata code with LaTex embedded.
 

@@ -1,0 +1,234 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage{siunitx}
+\usepackage{hyperref,graphicx,booktabs,dcolumn}
+\usepackage{stata}
+\usepackage[x11names]{xcolor}
+\usepackage{natbib}
+\usepackage{chngcntr}
+\usepackage{pgfplotstable}
+\usepackage{pdflscape}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+  
+\newcommand{\thedate}{\today}
+\counterwithin{figure}{section}
+\bibliographystyle{unsrt}
+\hypersetup{%
+    pdfborder = {0 0 0}
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \begin{flushright}
+        \Huge
+        \textbf{No effect of remoteness on clinical outcomes following myocardial infarction: an analysis of 43,927 myocardial infarctions in Victoria, Australia}
+\color{violet}
+\rule{16cm}{2mm} \\
+\Large
+\color{black}
+Protocol \\
+\thedate \\
+\color{blue}
+\url{https://github.com/cardiopharmnerd/outcomeremote} \\
+\color{black}
+       \vfill
+    \end{flushright}
+        \Large
+
+\noindent
+Adam Livori \\
+PhD Student \\
+\color{blue}
+\href{mailto:adam.livori1@Monash.edu}{adam.livori1@monash.edu} \\ 
+\color{black}
+\\
+Center for Medicine Use and Safety, Faculty of Pharmacy and Pharmaceutical Sciences, Monash University, Melbourne, Australia \\
+\\
+\end{titlepage}
+
+\pagebreak
+\tableofcontents
+\pagebreak
+
+\pagebreak
+\section{Preface}
+
+This is the protocol for the paper No effect of remoteness on clinical outcomes following myocardial infarction: an analysis of 43,927 myocardial infarctions in Victoria, Australia. \\
+This protocol details the data analysis methods that were undertaken from a linked dataset provided by the Victorian Department of Health as the source of Victorian Admitted Episodes Dataset data for this study, and the Centre for Victorian Data Linkage (Victorian Department of Health) for the provision of data linkage to NDI and MBS. This study was approved by the Human Research and Ethics Committees from the Australian Institute for Health and Welfare (AIHW) (EO2018/4/468) and Monash University (14339). \\
+The original cohort formation and data cleaning steps are noted in a \color{blue} \href{https://github.com/cardiopharmnerd/medsremote}{separate protocol} from a previous study \color{black}
+To generate this document, the Stata package texdoc was used, which is available from: \color{blue} \url{http://repec.sowi.unibe.ch/stata/texdoc/} \color{black} (accessed 14 November 2022). The final Stata do file and this pdf are available \color{blue} \href{https://github.com/jimb0w/BA}{here} \color{black}. The do file was originally coded and then exported from the Secure Unified Research Environment (SURE). Therefore, when reproducing the code, use the do file rather than copying from the LaTex document. 
+
+\section{Abbreviations} 
+
+\begin{itemize}
+\item A: Accessible (ARIA cateogry with values from 1.85 to 3.50)
+\item ABS: Australian Bureau of Statistics
+\item AF: Atrial fibrillation
+\item AIHW: Australian Institute of Health and Welfare
+\item ARIA: Accessability/remoteness index of Australia
+\item CABG: Coronary Artery Bypass Graft
+\item DM: Diabetes melitus
+\item GLM: Generalised linear model
+\item HA: Highly accessible (ARIA cateogry with values from 0.00 to 1.84)
+\item HF: Heart failure
+\item HT: Hypertension
+\item ICD: International classification of disease (ICD-10 Australian Modified codes were present in this dataset)
+\item IRSD: Index of relative socio-economic disadvantage
+\item IS: Ischaemic stroke
+\item MA: Moderately acceessible (ARIA cateogry with values from 3.51 to 5.80)
+\item MACE: Major adverse cardiovascular event
+\item MBS: Medicare benefits scheme
+\item MI: Myocardial infarction
+\item NDI: National Death Index
+\item NSTEMI: Non-ST elevation myocardial infarction
+\item PCI: Perceutaneous Coronary Intervention
+\item SLA: Statistical local area
+\item STEMI: ST elevation myocardial infarction
+\item VAED: Victorian admitted episode dataset
+\item WHO: World Health Organisation
+\end{itemize}
+
+\pagebreak
+
+\section{Introduction}
+
+MI is the leading cause of death and clinical burden worldwide \cite{virani2020}. The outcomes following MI can differ when comparing people living in metropolitan and non-metrolpolitan areas. Remoteness was found to be a driver for increase death in with a 2009-2012 cohort of people from Victoria \cite{jacobs2018}. This study analysed a cohort of 43,927 MI admissions in Victoria, Australia between 2012-2018 and included multiple adjustments for socioeconomic status, age, sex, cardiovascular comorbidity, and revascularisation strategy.\\
+The following protocol lists the steps that were taken to analyse this cohort using a linked dataset from the VAED, MBS and NDI. Outcomes of interest were 1-year 4-point MACE (defined as admission for MI, stroke; heart failure; or CV death), all-cause mortality, and each individual components of MACE. 
+
+\pagebreak
+
+\section{Identifying outcomes in cohort}
+\subsection{Recurrent MI}
+We will use an analysis dataset created from the \color{blue} \href{https://github.com/cardiopharmnerd/medsremote}{protocol} \color{black} of a previous study to analyse MI admissions within Victoria, Australia. We used ICD codes present in the dataset to define each outcome
+\color{violet} 	
+\begin{stlog}\input{log/1.log.tex}\end{stlog}
+\color{black}
+\subsection{Stroke}
+\color{violet}
+\begin{stlog}\input{log/2.log.tex}\end{stlog}
+\color{black}
+\subsection{HF hospitalisation}
+\color{violet}
+\begin{stlog}\input{log/3.log.tex}\end{stlog}
+\color{black}
+\subsection{Cardiovascular death}
+This outcome was taken using date of death from the merged NDI dataset and the primary underlying cause of death being of a cardiovascular ICD codes I10 to I99.
+\color{violet}
+\begin{stlog}\input{log/4.log.tex}\end{stlog}
+\color{black}
+\subsection{Merge outcome data}
+The outcomes data was merged into an analysis dataset with MI admission, remoteness, comorbidity, revascularisation method, and socioeconomic status. 
+\color{violet}
+\begin{stlog}\input{log/5.log.tex}\end{stlog}
+\color{black}
+\subsection{Overall MACE}
+Following the creation of inidivudal dates for events within MACE, we then created a field for MACE that returned the earliest date of an event within the MACE composite outcome. 
+\color{violet}
+\begin{stlog}\input{log/6.log.tex}\end{stlog}
+\color{black}
+\section{Analysis}
+\subsection{Results}
+\subsubsection{Cohort demographics}
+The table provides information on cohort demographics by remoteness category. 
+\color{violet}
+\begin{stlog}\input{log/7.log.tex}\end{stlog}
+\color{black}
+\subsection{Parametric survival analysis}
+A generalized linear model (GLM) with a log-link function and Poisson distribution was constructed for each outcome separately, using log of person-time as the offset and stratified by STEMI or NSTEMI. These models included spline effects of ARIA, age, time since MI, a binary effect of sex, cardiovascular comorbidities, and revascularization strategy, and IRSD as a continuous variable. Two models were constructed; one with predictions from the models made at mean values of the co-variates with respect to stratified NSTEMI and STEMI sub-cohorts; and one with means of co-variates from the total analysed cohort.\\
+This analysis was broken up into several steps:\\
+
+\begin{enumerate}
+\item Create prediction set for NSTEMI and STEMI stratified cohorts
+\item Create prediction set for total cohort
+\item Create fail dates across different ouctomes
+\item Perform survival analysis and predicted IRR (means for stratified cohorts)
+\item Perform survival analysis and predicted IRR (means for total cohort)
+\item Plot predicted IRR and confidence intervals with respect to remoteness
+\end{enumerate}
+
+\subsubsection{Create prediction set for NSTEMI and STEMI stratified cohorts}
+
+Using the analysis dataset, we created two separate datasets for NSTEMI and STEMI that lists the range of possible ARIA values along with the means values of the following co-variates:\\~\\ 
+\textbf{NSTEMI}
+\begin{itemize}
+\item Mean age 71.46
+\item Sex 1.36 [male = 1 female = 2]
+\item IRSD score 997.83
+\item Presence of hypertension 0.65 (binary)
+\item Presence of AF 0.16 (binary)
+\item Presence of heart failure 0.18 (binary
+\item Presence of diabetes 0.32 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.32 (binary)
+\item Received CABG within 90 days of admission 0.11 (binary)
+\end{itemize}
+
+\textbf{STEMI}
+\begin{itemize}
+\item Mean age 64.68
+\item Sex 1.26 [male = 1 female = 2]
+\item IRSD score 999.73
+\item Presence of hypertension 0.54 (binary)
+\item Presence of AF 0.12 (binary)
+\item Presence of heart failure 0.15 (binary
+\item Presence of diabetes 0.23 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.73 (binary)
+\item Received CABG within 90 days of admission 0.08 (binary)
+\end{itemize}
+
+\color{violet}
+\begin{stlog}\input{log/8.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Create prediction set for total cohort}
+We then created a similar dataset, but using the means of the total analysed cohort from the following co-variates:
+\begin{itemize}
+\item Mean age 69.74
+\item Sex 1.33 [male = 1 female = 2]
+\item IRSD score 998.31
+\item Presence of hypertension 0.62 (binary)
+\item Presence of AF 0.14 (binary)
+\item Presence of heart failure 0.17 (binary
+\item Presence of diabetes 0.30 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.43 (binary)
+\item Received CABG within 90 days of admission 0.10 (binary)
+\end{itemize}
+\color{violet}
+\begin{stlog}\input{log/9.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Create fail dates across different ouctomes}
+Using the outcome information, we created faildate date variables and fail tags for each outcome to be used in building survival models
+\color{violet}
+\begin{stlog}\input{log/10.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for stratified cohorts)}
+We ran analysis across each outcome, firslty creating spline for remoteness, time to event, and age, as well as creating an offset for person-years. \\
+We initially built a model with an interaction of ARIA and time to event, however when reviewing the Akaike Information Criterion the model was a better fit without the interaction. (see deactivated code noted by * before the line)\\
+We constructed a glm using poisson distrbution and a loglink function, noting the variance \= mean, demonstrating equipdisperion and meeting the assumption for Poisson distrubution. \\
+Finally we used the model for each outcome predict incident rate ratios as the means of covariates previously specified. 
+\color{violet}
+\begin{stlog}\input{log/11.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for total cohort)}
+The same process as above was carried out, but using the prediction dataset of the means of co-variates for the total analysed cohort; noting that we still stratified analysis by diagnosis.
+\color{violet}
+\begin{stlog}\input{log/12.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Plot predicted IRR and confidence intervals with respect to remoteness}
+Using the predcition datasets created for both models above across each of the six outcomes, we plotted predicited incident rates with 95\% confidence intervals with respect to ARIA. \\~\\
+\textbf{NSTEMI and STEMI models}
+\color{violet}
+\begin{stlog}\input{log/13.log.tex}\end{stlog}
+\color{black}
+\textbf{Total cohort model}
+\color{violet}
+\begin{stlog}\input{log/14.log.tex}\end{stlog}
+\clearpage
+\color{black}
+\bibliography{C:/Users/acliv1/Documents/library.bib}
+\end{document}
+

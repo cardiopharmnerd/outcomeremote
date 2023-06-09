@@ -858,6 +858,371 @@ graph export "G:\Adam\Project 2  - location and MI outcomes\Results\Fig_logoutco
 texdoc stlog close
 
 /***
+\color{black}
+\subsection{Sensitivity analysis}
+To account for possible intra-sample clustering due to people have repeat admissions for MI throughout the dataset (8151 admissions), a sensitivty analysis was conducted, replicating the parametric survival analysis but only using the first instance of MI in the cohort. 
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+use MI_ADS_ALL_MACE, clear
+br
+keep if priorMI == 0
+bysort ppn : ppncheck = _n
+ta ppncheck
+drop ppncheck
+save MI_ADS_FIRSTMIONLY_MACE, replace
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Create prediction set for NSTEMI and STEMI stratified cohorts}
+Using the analysis dataset, we created two separate datasets for NSTEMI and STEMI that lists the range of possible ARIA values along with the means values of the following co-variates:\\~\\ 
+\textbf{NSTEMI}
+\begin{itemize}
+\item Mean age 70.81
+\item Sex 1.36 [male = 1 female = 2]
+\item IRSD score 999.59
+\item Presence of hypertension 0.63 (binary)
+\item Presence of AF 0.15 (binary)
+\item Presence of heart failure 0.17 (binary
+\item Presence of diabetes 0.29 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.34 (binary)
+\item Received CABG within 90 days of admission 0.12 (binary)
+\end{itemize}
+
+\textbf{STEMI}
+\begin{itemize}
+\item Mean age 64.53
+\item Sex 1.26 [male = 1 female = 2]
+\item IRSD score 999.95
+\item Presence of hypertension 0.53 (binary)
+\item Presence of AF 0.12 (binary)
+\item Presence of heart failure 0.15 (binary
+\item Presence of diabetes 0.22 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.75 (binary)
+\item Received CABG within 90 days of admission 0.08 (binary)
+\end{itemize}
+
+\color{violet}
+***/
+
+
+texdoc stlog, cmdlog nodo
+
+use MIS_ADS_FIRSTMIONLY_MACE, clear
+gen agespline = agegroup + 2.5 if agegroup != 85
+replace agespline = agegroup + 5 if agegroup == 85
+save MI_ADS_FIRSTMIONLY_MACE, clear
+
+forval ii = 0/1 {
+use MI_ADS_ALL_MACE, clear
+foreach i in agespline sex IRSD_score HT AF HF DM IS CABG_tag PCI_tag {
+su(`i') if STEMI == `ii'
+local m`i' = r(mean)
+}
+clear
+set obs 49
+gen mean_ARIA = (_n-1)/10
+br
+foreach i in agespline sex IRSD_score HT AF HF DM IS CABG_tag PCI_tag {
+gen `i' = `m`i''
+}
+gen time =  5
+mkspline times=time, cubic knots(0 2 5 10)
+mkspline ARIAS= mean_ARIA, cubic knots(0 0.05 0.5 2)
+mkspline ages = agespline, cubic knots(32.5 62.5 72.5 77.5)
+gen py = 1
+save FIRSTMIoutcomeset_`ii', replace
+}
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Create prediction set for total cohort}
+We then created a similar dataset, but using the means of the total analysed cohort from the following co-variates:
+\begin{itemize}
+\item Mean age 69.03
+\item Sex 1.33 [male = 1 female = 2]
+\item IRSD score 999.69
+\item Presence of hypertension 0.60 (binary)
+\item Presence of AF 0.14 (binary)
+\item Presence of heart failure 0.16 (binary
+\item Presence of diabetes 0.27 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.46 (binary)
+\item Received CABG within 90 days of admission 0.11 (binary)
+\end{itemize}
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+use MI_ADS_ALL_MACE, clear
+foreach i in agespline sex IRSD_score HT AF HF DM IS CABG_tag PCI_tag {
+su(`i')
+local m`i' = r(mean)
+}
+clear
+set obs 49
+gen mean_ARIA = (_n-1)/10
+br
+foreach i in agespline sex IRSD_score HT AF HF DM IS CABG_tag PCI_tag {
+gen `i' = `m`i''
+}
+gen time =  5
+mkspline times=time, cubic knots(0 2 5 10)
+mkspline ARIAS= mean_ARIA, cubic knots(0 0.05 0.5 2)
+mkspline ages = agespline, cubic knots(32.5 62.5 72.5 77.5)
+gen py = 1
+save FIRSTMIoutcomeset, replace
+
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Create fail dates across different ouctomes}
+Using the outcome information, we created faildate date variables and fail tags for each outcome to be used in building survival models
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+use MI_ADS_ALL_MACE, clear
+gen faildate_365_death = min(deathdate,sepdate+365)
+gen fail_365_death = dead365
+gen faildate_365_mace = min(CV_death,nonfatal_MI,stroke,HF_adm,deathdate,sep+365)
+gen fail_365_mace = 0
+replace fail_365_mace = 1 if faildate_365_mace == CV_death | faildate_365_mace == nonfatal_MI ///
+ | faildate_365_mace == stroke | faildate_365_mace == HF_adm 
+gen faildate_365_cvd = min(CV_death, deathdate, sep+365)
+gen fail_365_cvd = 0
+replace fail_365_cvd = 1 if faildate_365_cvd == CV_death 
+gen faildate_365_mi = min(nonfatal_MI, deathdate, sep+365)
+gen fail_365_mi = 0
+replace fail_365_mi = 1 if faildate_365_mi == nonfatal_MI 
+gen faildate_365_stroke = min(stroke, deathdate, sep+365)
+gen fail_365_stroke = 0
+replace fail_365_stroke = 1 if faildate_365_stroke == stroke 
+gen faildate_365_hf = min(HF_adm, deathdate, sep+365)
+gen fail_365_hf = 0
+replace fail_365_hf = 1 if faildate_365_hf == HF_adm 
+save MI_ADS_FIRSTMIONLY_MACE_FAIL, replace
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for stratified cohorts)}
+We ran analysis across each outcome, firslty creating spline for remoteness, time to event, and age, as well as creating an offset for person-years. \\
+We initially built a model with an interaction of ARIA and time to event, however when reviewing the Akaike Information Criterion the model was a better fit without the interaction. (see deactivated code noted by * before the line)\\
+We constructed a glm using poisson distrbution and a loglink function, noting the variance \= mean, demonstrating equipdisperion and meeting the assumption for Poisson distrubution. \\
+Finally we used the model for each outcome predict incident rate ratios as the means of covariates previously specified. 
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+foreach i in death mace cvd mi stroke hf {
+forval ii = 0/1 {
+use MI_ADS_ALL_MACE_FAIL, clear
+stset faildate_365_`i', fail(fail_365_`i') entry(sepdate) origin(sepdate) scale(30.417) id(id)
+*create splines for remoteness
+mkspline ARIAS = mean_ARIA, cubic knots(0 0.05 0.5 2)
+*split times to allow for interaction variable of time to be created
+stsplit time, at(0(1)12)
+mkspline times = time, cubic knots(0 1 3 6)
+*create splines for ages
+mkspline ages = agegroup, cubic knots(32.5 62.5 72.5 77.5)
+*offset creation
+gen py = (_t - _t0)/12
+
+
+*build model with time as an interaction
+*poisson _d c.ARIAS*##c.times* c.ages* i.sex IRSD_score HT AF DM CA CPD IS CABG_tag PCI_tag, exposure(py) irr
+*estat ic
+*This model was not as efficient when time and ARIA interact, therefore proportional hazards over time can be assumed. 
+*Run analysis without the use of a interaction term for time and ARIA. 
+poisson _d c.ARIAS* c.times* c.ages* i.sex c.IRSD_score i.HF i.HT i.AF i.DM i.IS i.CABG_tag i.PCI_tag if STEMI == `ii', exposure(py) irr
+estat ic
+
+*Calculate prediction data for figure for NSTEMI and STEMI means
+use FIRSTMIoutcomeset_`ii', clear
+*create prediction variable from model
+predict A, ir
+*create SE to build confidence intervals
+predict B, stdp
+replace A = A * 1000
+gen ll = (exp(ln(A)-1.96*B)) 
+gen ul = (exp(ln(A)+1.96*B)) 
+gen STEMI = `ii'
+keep mean_ARIA A ul ll STEMI 
+
+save FIRSTMI`i'_`ii', replace
+}
+}
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for total cohort)}
+The same process as above was carried out, but using the prediction dataset of the means of co-variates for the total analysed cohort; noting that we still stratified analysis by diagnosis.
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+foreach i in death mace cvd mi stroke hf {
+forval ii = 0/1 {
+use MI_ADS_FIRSTMIONLY_MACE_FAIL, clear
+stset faildate_365_`i', fail(fail_365_`i') entry(sepdate) origin(sepdate) scale(30.417) id(id)
+*create splines for remoteness
+mkspline ARIAS = mean_ARIA, cubic knots(0 0.05 0.5 2)
+*split times to allow for interaction variable of time to be created
+stsplit time, at(0(1)12)
+mkspline times = time, cubic knots(0 1 3 6)
+*create splines for ages
+mkspline ages = agegroup, cubic knots(32.5 62.5 72.5 77.5)
+*offset creation
+gen py = (_t - _t0)/12
+
+
+*build model with time as an interaction
+*poisson _d c.ARIAS*##c.times* c.ages* i.sex IRSD_score HT AF DM CA CPD IS CABG_tag PCI_tag, exposure(py) irr
+*estat ic
+*This model was not as efficient when time and ARIA interact, therefore proportional hazards over time can be assumed. 
+*Run analysis without the use of a interaction term for time and ARIA. 
+poisson _d c.ARIAS* c.times* c.ages* i.sex c.IRSD_score i.HF i.HT i.AF i.DM i.IS i.CABG_tag i.PCI_tag if STEMI == `ii', exposure(py) irr
+estat ic
+
+*Calculate prediction data for figure for NSTEMI and STEMI means
+use FIRSTMIoutcomeset, clear
+*create prediction variable from model
+predict A, ir
+*create SE to build confidence intervals
+predict B, stdp
+replace A = A * 1000
+gen ll = (exp(ln(A)-1.96*B)) 
+gen ul = (exp(ln(A)+1.96*B)) 
+gen STEMI = `ii'
+keep mean_ARIA A ul ll STEMI 
+
+save FIRSTMI`i'_`ii'_total, replace
+}
+
+texdoc stlog close
+
+/***
+\color{black}
+\subsubsection{Plot predicted IRR and confidence intervals with respect to remoteness}
+Using the predcition datasets created for both models above across each of the six outcomes, we plotted predicited incident rates with 95\% confidence intervals with respect to ARIA. \\~\\
+\textbf{NSTEMI and STEMI models}
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+*NSTEMI
+foreach i in death mace cvd mi stroke hf {
+use FIRSTMI`i'_0, clear
+
+twoway ///
+(rarea ul ll mean_ARIA if STEMI == 0, col(navy%30) fintensity(inten80) lwidth(none)) ///
+(line A mean_ARIA if STEMI == 0, col(navy)) ///
+, graphregion(color(white)) ///
+xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
+legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
+title("`i'", placement(west) color(black) size(large))
+graph save "Graph" fig_log`i'_0, replace
+}
+
+*STEMI
+foreach i in death mace cvd mi stroke hf {
+use FIRSTMI`i'_1, clear
+
+twoway ///
+(rarea ul ll mean_ARIA if STEMI == 1, col(dkorange%30) fintensity(inten80) lwidth(none)) ///
+(line A mean_ARIA if STEMI == 1 , col(dkorange)) ///
+, graphregion(color(white)) ///
+xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
+legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
+title("`i'", placement(west) color(black) size(large))
+graph save "Graph" fig_log`i'_1, replace
+}
+*Combine all graphs
+{
+graph combine ///
+fig_logdeath_1.gph ///
+fig_logdeath_0.gph ///
+fig_logmace_1.gph ///
+fig_logmace_0.gph ///
+fig_logcvd_1.gph ///
+fig_logcvd_0.gph ///
+fig_logmi_1.gph ///
+fig_logmi_0.gph ///
+fig_logstroke_1.gph ///
+fig_logstroke_0.gph ///
+fig_loghf_1.gph ///
+fig_loghf_0.gph ///
+, altshrink cols(2) graphregion(color(white)) xsize(4.5) ysize(5)
+graph export "G:\Adam\Project 2  - location and MI outcomes\Results\Fig_logoutcomes_STEMI_NSTEMI_FIRSTMI.pdf", as(pdf) name("Graph") replace
+}
+}
+
+texdoc stlog close
+
+/***
+\color{black}
+\textbf{Total cohort model}
+\color{violet}
+***/
+
+texdoc stlog, cmdlog nodo
+
+foreach i in death mace cvd mi stroke hf {
+use FIRSTMI`i'_0_total, clear
+append using FIRSTMI`i'_1_total
+
+twoway ///
+(rarea ul ll mean_ARIA if STEMI == 1, col(dkorange%30) fintensity(inten80) lwidth(none)) ///
+(line A mean_ARIA if STEMI == 1 , col(dkorange)) ///
+(rarea ul ll mean_ARIA if STEMI == 0, col(navy%30) fintensity(inten80) lwidth(none)) ///
+(line A mean_ARIA if STEMI == 0, col(navy)) ///
+, graphregion(color(white)) ///
+xtitle("mean ARIA score") ytitle("Predicted incidence rate per 1000 person-years") ///
+legend(order(4 "NSTEMI" 2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
+title("`i'", placement(west) color(black) size(medium))
+graph save "Graph" fig_log`i', replace
+}
+
+*Combine all graphs
+{
+graph combine ///
+fig_logdeath.gph ///
+fig_logmace.gph ///
+fig_logcvd.gph ///
+fig_logmi.gph ///
+fig_logstroke.gph ///
+fig_loghf.gph ///
+, altshrink cols(2) graphregion(color(white)) xsize(4.5)
+graph export "G:\Adam\Project 2  - location and MI outcomes\Results\Fig_logoutcomes_total_FIRSTMI.pdf", as(pdf) name("Graph") replace
+}
+
+
+texdoc stlog close
+
+
+/***
 \clearpage
 \color{black}
 \bibliography{C:/Users/acliv1/Documents/library.bib}

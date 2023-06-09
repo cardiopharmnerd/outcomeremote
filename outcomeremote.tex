@@ -227,6 +227,89 @@ Using the predcition datasets created for both models above across each of the s
 \textbf{Total cohort model}
 \color{violet}
 \begin{stlog}\input{log/14.log.tex}\end{stlog}
+\color{black}
+\subsection{Sensitivity analysis}
+To account for possible intra-sample clustering due to people have repeat admissions for MI throughout the dataset (8151 admissions), a sensitivty analysis was conducted, replicating the parametric survival analysis but only using the first instance of MI in the cohort. 
+\color{violet}
+\begin{stlog}\input{log/15.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Create prediction set for NSTEMI and STEMI stratified cohorts}
+Using the analysis dataset, we created two separate datasets for NSTEMI and STEMI that lists the range of possible ARIA values along with the means values of the following co-variates:\\~\\ 
+\textbf{NSTEMI}
+\begin{itemize}
+\item Mean age 70.81
+\item Sex 1.36 [male = 1 female = 2]
+\item IRSD score 999.59
+\item Presence of hypertension 0.63 (binary)
+\item Presence of AF 0.15 (binary)
+\item Presence of heart failure 0.17 (binary
+\item Presence of diabetes 0.29 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.34 (binary)
+\item Received CABG within 90 days of admission 0.12 (binary)
+\end{itemize}
+
+\textbf{STEMI}
+\begin{itemize}
+\item Mean age 64.53
+\item Sex 1.26 [male = 1 female = 2]
+\item IRSD score 999.95
+\item Presence of hypertension 0.53 (binary)
+\item Presence of AF 0.12 (binary)
+\item Presence of heart failure 0.15 (binary
+\item Presence of diabetes 0.22 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.75 (binary)
+\item Received CABG within 90 days of admission 0.08 (binary)
+\end{itemize}
+
+\color{violet}
+\begin{stlog}\input{log/16.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Create prediction set for total cohort}
+We then created a similar dataset, but using the means of the total analysed cohort from the following co-variates:
+\begin{itemize}
+\item Mean age 69.03
+\item Sex 1.33 [male = 1 female = 2]
+\item IRSD score 999.69
+\item Presence of hypertension 0.60 (binary)
+\item Presence of AF 0.14 (binary)
+\item Presence of heart failure 0.16 (binary
+\item Presence of diabetes 0.27 (binary)
+\item Pesence of ischaemic stroke 0.01 (binary)
+\item Received PCI within 90 days of admission 0.46 (binary)
+\item Received CABG within 90 days of admission 0.11 (binary)
+\end{itemize}
+\color{violet}
+\begin{stlog}\input{log/17.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Create fail dates across different ouctomes}
+Using the outcome information, we created faildate date variables and fail tags for each outcome to be used in building survival models
+\color{violet}
+\begin{stlog}\input{log/18.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for stratified cohorts)}
+We ran analysis across each outcome, firslty creating spline for remoteness, time to event, and age, as well as creating an offset for person-years. \\
+We initially built a model with an interaction of ARIA and time to event, however when reviewing the Akaike Information Criterion the model was a better fit without the interaction. (see deactivated code noted by * before the line)\\
+We constructed a glm using poisson distrbution and a loglink function, noting the variance \= mean, demonstrating equipdisperion and meeting the assumption for Poisson distrubution. \\
+Finally we used the model for each outcome predict incident rate ratios as the means of covariates previously specified. 
+\color{violet}
+\begin{stlog}\input{log/19.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Perform survival analysis and predicted IRR (means for total cohort)}
+The same process as above was carried out, but using the prediction dataset of the means of co-variates for the total analysed cohort; noting that we still stratified analysis by diagnosis.
+\color{violet}
+\begin{stlog}\input{log/20.log.tex}\end{stlog}
+\color{black}
+\subsubsection{Plot predicted IRR and confidence intervals with respect to remoteness}
+Using the predcition datasets created for both models above across each of the six outcomes, we plotted predicited incident rates with 95\% confidence intervals with respect to ARIA. \\~\\
+\textbf{NSTEMI and STEMI models}
+\color{violet}
+\begin{stlog}\input{log/21.log.tex}\end{stlog}
+\color{black}
+\textbf{Total cohort model}
+\color{violet}
+\begin{stlog}\input{log/22.log.tex}\end{stlog}
 \clearpage
 \color{black}
 \bibliography{C:/Users/acliv1/Documents/library.bib}

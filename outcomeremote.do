@@ -774,7 +774,7 @@ twoway ///
 (line A mean_ARIA if STEMI == 0, col(navy)) ///
 , graphregion(color(white)) ///
 xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
-legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
 yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
 title("`i'", placement(west) color(black) size(large))
 graph save "Graph" fig_log`i'_0, replace
@@ -789,7 +789,7 @@ twoway ///
 (line A mean_ARIA if STEMI == 1 , col(dkorange)) ///
 , graphregion(color(white)) ///
 xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
-legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
 yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
 title("`i'", placement(west) color(black) size(large))
 graph save "Graph" fig_log`i'_1, replace
@@ -1138,7 +1138,7 @@ twoway ///
 (line A mean_ARIA if STEMI == 0, col(navy)) ///
 , graphregion(color(white)) ///
 xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
-legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
 yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
 title("`i'", placement(west) color(black) size(large))
 graph save "Graph" fig_log`i'_0, replace
@@ -1153,7 +1153,7 @@ twoway ///
 (line A mean_ARIA if STEMI == 1 , col(dkorange)) ///
 , graphregion(color(white)) ///
 xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
-legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
 yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
 title("`i'", placement(west) color(black) size(large))
 graph save "Graph" fig_log`i'_1, replace

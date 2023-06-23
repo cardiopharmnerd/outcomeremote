@@ -63,7 +63,7 @@ Center for Medicine Use and Safety, Faculty of Pharmacy and Pharmaceutical Scien
 This is the protocol for the paper No effect of remoteness on clinical outcomes following myocardial infarction: an analysis of 43,927 myocardial infarctions in Victoria, Australia. \\
 This protocol details the data analysis methods that were undertaken from a linked dataset provided by the Victorian Department of Health as the source of Victorian Admitted Episodes Dataset data for this study, and the Centre for Victorian Data Linkage (Victorian Department of Health) for the provision of data linkage to NDI and MBS. This study was approved by the Human Research and Ethics Committees from the Australian Institute for Health and Welfare (AIHW) (EO2018/4/468) and Monash University (14339). \\
 The original cohort formation and data cleaning steps are noted in a \color{blue} \href{https://github.com/cardiopharmnerd/medsremote}{separate protocol} from a previous study \color{black}
-To generate this document, the Stata package texdoc was used, which is available from: \color{blue} \url{http://repec.sowi.unibe.ch/stata/texdoc/} \color{black} (accessed 14 November 2022). The final Stata do file and this pdf are available \color{blue} \href{https://github.com/jimb0w/BA}{here} \color{black}. The do file was originally coded and then exported from the Secure Unified Research Environment (SURE). Therefore, when reproducing the code, use the do file rather than copying from the LaTex document. 
+To generate this document, the Stata package texdoc was used, which is available from: \color{blue} \url{http://repec.sowi.unibe.ch/stata/texdoc/} \color{black} (accessed 14 November 2022). The final Stata do file and this pdf are available \color{blue} \href{https://github.com/cardiopharmnerd/outcomeremote}{here} \color{black}. The do file was originally coded and then exported from the Secure Unified Research Environment (SURE). Therefore, when reproducing the code, use the do file rather than copying from the LaTex document. 
 
 \section{Abbreviations} 
 
@@ -774,7 +774,7 @@ twoway ///
 (line A mean_ARIA if STEMI == 0, col(navy)) ///
 , graphregion(color(white)) ///
 xtitle("mean ARIA score", size(large)) ytitle("Predicted incidence rate*", size(large)) ///
-legend(order(2 "NSTEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
+legend(order(2 "STEMI") position(6) ring(0) row(1) col(2) region(lcolor(white) color(none))) ///
 yscale(log range(2 80)) ylabel(2 "2" 5 "5" 10 "10" 20 "20" 50 "50" 100 "100", angle(0) format(%9.0f)) xscale(range(0 5)) ///
 title("`i'", placement(west) color(black) size(large))
 graph save "Graph" fig_log`i'_0, replace
